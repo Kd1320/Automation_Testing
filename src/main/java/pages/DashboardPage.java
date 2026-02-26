@@ -1,3 +1,4 @@
+
 package pages;
 
 import org.openqa.selenium.By;
@@ -5,18 +6,12 @@ import org.openqa.selenium.WebDriver;
 
 public class DashboardPage {
 
-    WebDriver driver;
+    private final WebDriver driver;
 
-    By managerID = By.xpath("//td[contains(text(),'Manger Id')]");
-
-    By newAccountLink = By.linkText("New Account");
-    By editAccountLink = By.linkText("Edit Account");
-    By depositLink = By.linkText("Deposit");
-    By withdrawalLink = By.linkText("Withdrawal");
-    By fundTransferLink = By.linkText("Fund Transfer");
-    By miniStatementLink = By.linkText("Mini Statement");
-    By customizedStatementLink = By.linkText("Customised Statement");
-    By logoutLink = By.linkText("Log out");
+    // Note: Page shows "Manger Id" (typo on site), not "Manager Id"
+    private final By managerID = By.xpath("//td[contains(text(),'Manger Id')]");
+    private final By fundTransferLink = By.linkText("Fund Transfer");
+    private final By logoutLink = By.linkText("Log out");
 
     public DashboardPage(WebDriver driver) {
         this.driver = driver;
@@ -24,6 +19,11 @@ public class DashboardPage {
 
     public boolean isManagerIDDisplayed() {
         return driver.findElement(managerID).isDisplayed();
+    }
+
+    // Alias for convenience (used by some tests)
+    public boolean isManagerIdVisible() {
+        return isManagerIDDisplayed();
     }
 
     public void clickFundTransfer() {

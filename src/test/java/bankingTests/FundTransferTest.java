@@ -2,27 +2,44 @@
 package bankingTests;
 
 import base.BaseClass;
-import pages.LoginPage;
-import pages.DashboardPage;
-import pages.FundTransferPage;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.FundTransferPage;
+import pages.LoginPage;
+import utils.ConfigReader;
 
 public class FundTransferTest extends BaseClass {
 
     @Test
-    public void verifyFundTransfer() {
+    public void openFundTransferForm_afterValidLogin() {
+        String baseUrl = ConfigReader.get("baseUrl");
+        String user    = ConfigReader.get("username");
+        String pass    = ConfigReader.get("password");
 
-        driver.get("https://demo.guru99.com/V4/");
+        new LoginPage(driver).open(baseUrl).enterUsername(user).enterPassword(pass).clickLogin();
 
-        LoginPage login = new LoginPage(driver);
-        login.enterUsername("mngr34926");
-        login.enterPassword("amUpenu");
-        login.clickLogin();
+        FundTransferPage ft = new FundTransferPage(driver);
+        ft.openFundTransfer();
+        Assert.assertTrue(ft.isFormLoaded(), "Fund Transfer form not loaded");
+        System.out.println("✅ Fund Transfer form loaded.");
+    }
 
-        FundTransferPage fund = new FundTransferPage(driver);
-        fund.openFundTransfer();
-        fund.transfer("123456", "654321", "5000", "Testing Transfer");
+    @Test
+    public void transferWithInvalidAccounts_shouldShowAlert() {
+        String baseUrl = ConfigReader.get("baseUrl");
+        String user    = ConfigReader.get("username");
+        String pass    = ConfigReader.get("password");
 
-        System.out.println("Fund Transfer Test Passed");
+        new LoginPage(driver).open(baseUrl).enterUsername(user).enterPassword(pass).clickLogin();
+
+        FundTransferPage ft = new FundTransferPage(driver);
+        ft.openFundTransfer();
+        Assert.assertTrue(ft.isFormLoaded(), "Fund Transfer form not loaded");
+
+        ft.transfer("111111", "222222", "5000", "invalid accounts");
+
+        String alert = acceptAlertIfPresent();
+        Assert.assertNotNull(alert, "Expected alert for invalid accounts, but none appeared");
+        System.out.println("⚠️ Fund transfer invalid alert: " + alert);
     }
 }
