@@ -39,7 +39,7 @@ public class AccountsTest extends BaseClass {
         ap.enterAccount("999999"); // invalid
         ap.submit();
 
-        String alert = acceptAlertIfPresent();
+        String alert = acceptAlertIfPresent(3);
         Assert.assertNotNull(alert, "Expected alert for invalid account but none appeared");
         System.out.println("⚠️ Balance Enquiry invalid alert: " + alert);
     }

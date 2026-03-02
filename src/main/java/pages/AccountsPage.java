@@ -1,12 +1,16 @@
 
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class AccountsPage {
 
     private final WebDriver driver;
+    private final WebDriverWait wait;
 
     private final By balanceLink = By.linkText("Balance Enquiry");
     private final By accountNo   = By.name("accountno");
@@ -17,23 +21,37 @@ public class AccountsPage {
 
     public AccountsPage(WebDriver driver) {
         this.driver = driver;
+        this.wait   = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     public void openBalance() {
-        driver.findElement(balanceLink).click();
+        WebElement link = wait.until(ExpectedConditions.presenceOfElementLocated(balanceLink));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", link);
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(accountNo));
     }
 
     public boolean isBalanceFormLoaded() {
-        return driver.findElement(accountNo).isDisplayed();
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(accountNo));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void enterAccount(String acc) {
-        driver.findElement(accountNo).clear();
-        driver.findElement(accountNo).sendKeys(acc);
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(accountNo));
+        input.clear();
+        input.sendKeys(acc);
     }
 
     public void submit() {
-        driver.findElement(submitBtn).click();
+        wait.until(ExpectedConditions.elementToBeClickable(submitBtn)).click();
     }
 
     public boolean isBalanceDetailsShown() {

@@ -1,48 +1,62 @@
 
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class FundTransferPage {
-
     private final WebDriver driver;
+    private final WebDriverWait wait;
 
     private final By fundTransferLink = By.linkText("Fund Transfer");
-    private final By payer = By.name("payersaccount");
-    private final By payee = By.name("payeeaccount");
-    private final By amount = By.name("ammount");
-    private final By desc = By.name("desc");
-    private final By submit = By.name("AccSubmit");
-
-    // Optional: success block often shows this heading when real accounts are used
-    private final By transferDetailsHeading = By.xpath("//p[text()='Fund Transfer Details']");
+    private final By payerAccount     = By.name("payersaccount");
+    private final By payeeAccount     = By.name("payeeaccount");
+    private final By amount           = By.name("ammount");
+    private final By description      = By.name("desc");
+    private final By submitBtn        = By.name("AccSubmit");
+    private final By formMarker       = By.cssSelector("form[action*='stmt/Input'], form[action*='fundtrans'], input[name='payersaccount']");
 
     public FundTransferPage(WebDriver driver) {
         this.driver = driver;
+        this.wait   = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     public void openFundTransfer() {
-        driver.findElement(fundTransferLink).click();
+        WebElement link = wait.until(ExpectedConditions.presenceOfElementLocated(fundTransferLink));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", link);
+
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+        }
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(formMarker));
     }
 
     public boolean isFormLoaded() {
-        return driver.findElement(payer).isDisplayed()
-                && driver.findElement(payee).isDisplayed()
-                && driver.findElement(amount).isDisplayed()
-                && driver.findElement(desc).isDisplayed();
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(formMarker));
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
-    public void transfer(String payerAcc, String payeeAcc, String amt, String description) {
-        driver.findElement(payer).clear();  driver.findElement(payer).sendKeys(payerAcc);
-        driver.findElement(payee).clear();  driver.findElement(payee).sendKeys(payeeAcc);
-        driver.findElement(amount).clear(); driver.findElement(amount).sendKeys(amt);
-        driver.findElement(desc).clear();   driver.findElement(desc).sendKeys(description);
-        driver.findElement(submit).click();
-    }
+    public void transfer(String payer, String payee, String amt, String descText) {
+        WebElement payerEl = wait.until(ExpectedConditions.visibilityOfElementLocated(payerAccount));
+        WebElement payeeEl = wait.until(ExpectedConditions.visibilityOfElementLocated(payeeAccount));
+        WebElement amtEl   = wait.until(ExpectedConditions.visibilityOfElementLocated(amount));
+        WebElement descEl  = wait.until(ExpectedConditions.visibilityOfElementLocated(description));
 
-    public boolean isTransferDetailsShown() {
-        return !driver.findElements(transferDetailsHeading).isEmpty()
-                && driver.findElement(transferDetailsHeading).isDisplayed();
+        payerEl.clear(); payerEl.sendKeys(payer);
+        payeeEl.clear(); payeeEl.sendKeys(payee);
+        amtEl.clear();   amtEl.sendKeys(amt);
+        descEl.clear();  descEl.sendKeys(descText);
+
+        wait.until(ExpectedConditions.elementToBeClickable(submitBtn)).click();
     }
 }

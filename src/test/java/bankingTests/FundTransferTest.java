@@ -38,7 +38,7 @@ public class FundTransferTest extends BaseClass {
 
         ft.transfer("111111", "222222", "5000", "invalid accounts");
 
-        String alert = acceptAlertIfPresent();
+        String alert = acceptAlertIfPresent(3);
         Assert.assertNotNull(alert, "Expected alert for invalid accounts, but none appeared");
         System.out.println("⚠️ Fund transfer invalid alert: " + alert);
     }

@@ -19,7 +19,6 @@ public class LoginTest extends BaseClass {
 
         new LoginPage(driver).open(baseUrl).enterUsername(user).enterPassword(pass).clickLogin();
 
-        // If any alert pops up, fail (valid creds should not trigger alert)
         String alert = acceptAlertIfPresent(3);
         Assert.assertNull(alert, "Unexpected alert on valid login: " + alert);
 
@@ -28,13 +27,12 @@ public class LoginTest extends BaseClass {
         System.out.println("✅ Login valid flow passed.");
     }
 
-
     @DataProvider
     public Object[][] invalidCreds() {
         return new Object[][] {
                 {"wrongUser", "wrongPass", "invalid combo"},
                 {"", "somepass", "blank user"},
-                {"", "", "blank both"}   // keep this
+                {"", "", "blank both"}
         };
     }
 
@@ -44,7 +42,7 @@ public class LoginTest extends BaseClass {
 
         new LoginPage(driver).open(baseUrl).enterUsername(user).enterPassword(pass).clickLogin();
 
-        String alert = acceptAlertIfPresent(); // default 3s
+        String alert = acceptAlertIfPresent(3);
         Assert.assertNotNull(alert, "Expected alert for invalid login (" + note + ") but none appeared");
         System.out.println("⚠️ Invalid login (" + note + ") alert: " + alert);
     }

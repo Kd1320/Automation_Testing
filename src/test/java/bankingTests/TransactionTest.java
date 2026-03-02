@@ -39,7 +39,7 @@ public class TransactionTest extends BaseClass {
         tp.enterAccount("999999"); // invalid
         tp.submit();
 
-        String alert = acceptAlertIfPresent();
+        String alert = acceptAlertIfPresent(3);
         Assert.assertNotNull(alert, "Expected alert for invalid account but none appeared");
         System.out.println("⚠️ Mini Statement invalid alert: " + alert);
     }
